@@ -34,11 +34,12 @@ G_BEGIN_DECLS
 
 typedef struct _HarHeaders HarHeaders;
 typedef struct _HarHeadersClass HarHeadersClass;
+typedef struct _HarHeadersPrivate HarHeadersPrivate;
 
 struct _HarHeaders
 {
   HarObject parent_instance;
-  GList * query;
+  GSList * list;
 };
 
 struct _HarHeadersClass

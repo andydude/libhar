@@ -82,7 +82,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS =
+bin_PROGRAMS = har-entry-test$(EXEEXT) har-request-test$(EXEEXT) \
+	har-response-test$(EXEEXT) har-timings-test$(EXEEXT) \
+	$(am__EXEEXT_1)
 @HAVE_INTROSPECTION_TRUE@am__append_1 = Har-1.gir
 @HAVE_INTROSPECTION_TRUE@am__append_2 = $(gir_DATA) $(typelib_DATA)
 subdir = har
@@ -139,7 +141,7 @@ am__objects_2 = har-object.lo har-cache-entry.lo har-cache.lo \
 	har-message-body.lo har-message-utils.lo har-message.lo \
 	har-post-param.lo har-query-param.lo har-request-body.lo \
 	har-request.lo har-response-body.lo har-response.lo \
-	har-timings.lo gslist.lo $(am__objects_1)
+	har-timings.lo curl-easy.lo gslist.lo $(am__objects_1)
 am__objects_3 = $(am__objects_1)
 am_libhar_la_OBJECTS = $(am__objects_2) $(am__objects_3)
 libhar_la_OBJECTS = $(am_libhar_la_OBJECTS)
@@ -150,7 +152,36 @@ am__v_lt_1 =
 libhar_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libhar_la_LDFLAGS) $(LDFLAGS) -o $@
+am__EXEEXT_1 =
 PROGRAMS = $(bin_PROGRAMS)
+am_har_entry_test_OBJECTS = har-entry-test-main.$(OBJEXT)
+har_entry_test_OBJECTS = $(am_har_entry_test_OBJECTS)
+har_entry_test_LDADD = $(LDADD)
+har_entry_test_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(AM_CFLAGS) $(CFLAGS) $(har_entry_test_LDFLAGS) $(LDFLAGS) -o \
+	$@
+am_har_request_test_OBJECTS = har-request-test-main.$(OBJEXT)
+har_request_test_OBJECTS = $(am_har_request_test_OBJECTS)
+har_request_test_LDADD = $(LDADD)
+har_request_test_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(AM_CFLAGS) $(CFLAGS) $(har_request_test_LDFLAGS) $(LDFLAGS) \
+	-o $@
+am_har_response_test_OBJECTS = har-response-test-main.$(OBJEXT)
+har_response_test_OBJECTS = $(am_har_response_test_OBJECTS)
+har_response_test_LDADD = $(LDADD)
+har_response_test_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(AM_CFLAGS) $(CFLAGS) $(har_response_test_LDFLAGS) $(LDFLAGS) \
+	-o $@
+am_har_timings_test_OBJECTS = har-timings-test-main.$(OBJEXT)
+har_timings_test_OBJECTS = $(am_har_timings_test_OBJECTS)
+har_timings_test_LDADD = $(LDADD)
+har_timings_test_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(AM_CFLAGS) $(CFLAGS) $(har_timings_test_LDFLAGS) $(LDFLAGS) \
+	-o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -185,8 +216,12 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libhar_la_SOURCES)
-DIST_SOURCES = $(libhar_la_SOURCES)
+SOURCES = $(libhar_la_SOURCES) $(har_entry_test_SOURCES) \
+	$(har_request_test_SOURCES) $(har_response_test_SOURCES) \
+	$(har_timings_test_SOURCES)
+DIST_SOURCES = $(libhar_la_SOURCES) $(har_entry_test_SOURCES) \
+	$(har_request_test_SOURCES) $(har_response_test_SOURCES) \
+	$(har_timings_test_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -390,7 +425,6 @@ source_h = \
 	$(top_srcdir)/har/har-response-body.h \
 	$(top_srcdir)/har/har-response.h \
 	$(top_srcdir)/har/har-timings.h \
-	$(top_srcdir)/har/gslist.h \
 	$(NULL)
 
 source_c = \
@@ -411,11 +445,22 @@ source_c = \
 	har-response-body.c \
 	har-response.c \
 	har-timings.c \
+    curl-easy.h \
+	curl-easy.c \
+    gslist.h \
 	gslist.c \
 	$(NULL)
 
+har_entry_test_SOURCES = har-entry-test-main.c
+har_entry_test_LDFLAGS = -lhar $(AM_LDFLAGS)
+har_request_test_SOURCES = har-request-test-main.c
+har_request_test_LDFLAGS = -lhar $(AM_LDFLAGS)
+har_response_test_SOURCES = har-response-test-main.c
+har_response_test_LDFLAGS = -lhar $(AM_LDFLAGS)
+har_timings_test_SOURCES = har-timings-test-main.c
+har_timings_test_LDFLAGS = -lhar $(AM_LDFLAGS)
 libhar_la_SOURCES = $(source_c) $(source_h)
-libhar_la_LDFLAGS = -release 0.3 -version-info 0:3
+libhar_la_LDFLAGS = -release 0.3 -version-info 0:3 $(AM_LDFLAGS)
 harincludedir = $(includedir)/har
 harinclude_DATA = \
 	$(source_h) \
@@ -558,16 +603,34 @@ clean-binPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
+har-entry-test$(EXEEXT): $(har_entry_test_OBJECTS) $(har_entry_test_DEPENDENCIES) $(EXTRA_har_entry_test_DEPENDENCIES) 
+	@rm -f har-entry-test$(EXEEXT)
+	$(AM_V_CCLD)$(har_entry_test_LINK) $(har_entry_test_OBJECTS) $(har_entry_test_LDADD) $(LIBS)
+
+har-request-test$(EXEEXT): $(har_request_test_OBJECTS) $(har_request_test_DEPENDENCIES) $(EXTRA_har_request_test_DEPENDENCIES) 
+	@rm -f har-request-test$(EXEEXT)
+	$(AM_V_CCLD)$(har_request_test_LINK) $(har_request_test_OBJECTS) $(har_request_test_LDADD) $(LIBS)
+
+har-response-test$(EXEEXT): $(har_response_test_OBJECTS) $(har_response_test_DEPENDENCIES) $(EXTRA_har_response_test_DEPENDENCIES) 
+	@rm -f har-response-test$(EXEEXT)
+	$(AM_V_CCLD)$(har_response_test_LINK) $(har_response_test_OBJECTS) $(har_response_test_LDADD) $(LIBS)
+
+har-timings-test$(EXEEXT): $(har_timings_test_OBJECTS) $(har_timings_test_DEPENDENCIES) $(EXTRA_har_timings_test_DEPENDENCIES) 
+	@rm -f har-timings-test$(EXEEXT)
+	$(AM_V_CCLD)$(har_timings_test_LINK) $(har_timings_test_OBJECTS) $(har_timings_test_LDADD) $(LIBS)
+
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/curl-easy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gslist.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-cache-entry.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-cache.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-cookie.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-entry-test-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-entry.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-header.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-headers.Plo@am__quote@
@@ -578,9 +641,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-post-param.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-query-param.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-request-body.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-request-test-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-request.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-response-body.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-response-test-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-response.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-timings-test-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-timings.Plo@am__quote@
 
 .c.o:

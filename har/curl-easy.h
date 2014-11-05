@@ -13,7 +13,7 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <curl/curl.h>
-#include "curl-easy.h"
+#include <curl/easy.h>
 
 /*
  * Type macros.
@@ -32,30 +32,30 @@ G_BEGIN_DECLS
  * Forward declarations.
  */
 
-typedef struct _CurlEasy CurlEasy;
-typedef struct _CurlEasyClass CurlEasyClass;
+//typedef CURL CurlEasy;
+//typedef CURLM CurlMulti;
+//
 
-struct _CurlEasy
-{
-  GObject parent_instance;
-  CURL * handle;
-};
+typedef CURL CurlEasy;
 
-struct _CurlEasyClass
-{
-  GObjectClass parent_class;
-};
-
-enum _CurlEasyProperties {
-	CURL_EASY_DUMMY_PROPERTY,
-    CURL_EASY_N_PROPERTIES
-};
+//struct _CurlEasy
+//{
+//  GValue parent_value;
+//};
 
 /*
  * Method definitions.
  */
 
-CurlEasy * curl_easy_new (void);
+/**
+ * curl_easy_get_type:
+ */
+GType curl_easy_get_type (void);
+
+/**
+ * curl_easy_new:
+ */
+GValue * curl_easy_new (void);
 
 G_END_DECLS
 

@@ -52,6 +52,7 @@ struct _HarResponse
   HarResponsePrivate * priv;
   /*< public >*/
 
+  HarResponseBody * body;
   guint status;
 };
 
@@ -70,11 +71,13 @@ enum _HarResponseProperties {
   HAR_RESPONSE_VERSION,
   HAR_RESPONSE_COOKIES,
   HAR_RESPONSE_HEADERS,
-  HAR_RESPONSE_BODY,
   HAR_RESPONSE_HEADERS_SIZE,
   HAR_RESPONSE_BODY_SIZE,
+  HAR_RESPONSE_HTTP_VERSION,
+  //HAR_RESPONSE_HTTP_HEADERS,
 
   /* HarResponse */
+  HAR_RESPONSE_BODY,
   HAR_RESPONSE_STATUS,
   HAR_RESPONSE_REASON,
   HAR_RESPONSE_REDIRECT_URL,
@@ -114,16 +117,16 @@ void har_response_set_cookies (HarResponse * self, GSList * value);
  * har_response_get_headers:
  * @self: a #HarResponse.
  *
- * Returns: (transfer none) (type HarHeaders): a #HarHeaders.
+ * Returns: (transfer none) (element-type HarHeader): a #GSList of #HarHeader.
  */
-HarHeaders * har_response_get_headers (HarResponse * self);
+GSList * har_response_get_headers (HarResponse * self);
 
 /**
  * har_response_set_headers:
  * @self: a #HarResponse.
- * @value: (transfer full) (type HarHeaders): a #HarHeaders.
+ * @value: (transfer full) (element-type HarHeader): a #GSList of #HarHeader.
  */
-void har_response_set_headers (HarResponse * self, HarHeaders * value);
+void har_response_set_headers (HarResponse * self, GSList * value);
 
 /**
  * har_response_get_body:
@@ -154,6 +157,21 @@ void har_response_set_reason (HarResponse * self, const gchar * value);
 
 const gchar * har_response_get_redirect_url (HarResponse * self);
 void har_response_set_redirect_url (HarResponse * self, const gchar * value);
+
+/**
+ * har_response_get_http_version:
+ * @self: a #HarResponse.
+ *
+ * Returns: a number.
+ */
+const gchar * har_response_get_http_version (HarResponse * self);
+
+/**
+ * har_response_set_http_version:
+ * @self: a #HarResponse.
+ * @value: a number.
+ */
+void har_response_set_http_version (HarResponse * self, const gchar * value);
 
 G_END_DECLS
 

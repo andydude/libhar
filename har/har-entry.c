@@ -185,20 +185,20 @@ har_entry_class_init (HarEntryClass * klass)
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_ENTRY_CACHE, 
     g_param_spec_object ("cache", "cache", "cache", HAR_TYPE_CACHE, FLAGS));
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_ENTRY_SERVER_IP_ADDRESS, 
-    g_param_spec_string ("server-ip-address", "serverIPAddress", "TODO.", NULL, FLAGS));
+    g_param_spec_string ("serverIPAddress", "server-ip-address", "TODO.", NULL, FLAGS));
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_ENTRY_SERVER_PORT, 
-    g_param_spec_uint ("server-port", "serverPort", "TODO.", 0, G_MAXUINT, 0, FLAGS));
+    g_param_spec_uint ("serverPort", "server-port", "TODO.", 0, G_MAXUINT, 0, FLAGS));
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_ENTRY_CLIENT_IP_ADDRESS, 
-    g_param_spec_string ("client-ip-address", "clientIPAddress", "TODO.", NULL, FLAGS));
+    g_param_spec_string ("clientIPAddress", "client-ip-address", "TODO.", NULL, FLAGS));
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_ENTRY_CLIENT_PORT, 
-    g_param_spec_uint ("client-port", "clientPort", "TODO.", 0, G_MAXUINT, 0, FLAGS));
+    g_param_spec_uint ("clientPort", "client-port", "TODO.", 0, G_MAXUINT, 0, FLAGS));
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_ENTRY_CONNECTION, 
     g_param_spec_string ("connection", "connection", "Connection information, may be a pointer or ID.", NULL, FLAGS));
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_ENTRY_TIMINGS, 
     g_param_spec_object ("timings", "timings", "TODO.", HAR_TYPE_TIMINGS, FLAGS));
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_ENTRY_TIMEOUTS, 
     g_param_spec_object ("timeouts", "timeouts", "TODO.", HAR_TYPE_TIMINGS, FLAGS));
-  // TODO: add _PARSE
+
 #undef FLAGS
 
 }
@@ -212,7 +212,12 @@ har_entry_init (HarEntry * self)
   g_return_if_fail (self->priv != NULL);
 
   self->priv->_time = -1.0;
-  self->started = NULL;
+  self->priv->_server_ip_address = NULL;
+  self->priv->_server_port = 0;
+  self->priv->_client_ip_address = NULL;
+  self->priv->_client_port = 0;
+  self->priv->_connection = "";
+  self->started = g_date_time_new_now_utc ();
   self->request = har_request_new ();
   self->response = har_response_new ();
   self->cache = har_cache_new ();
@@ -280,6 +285,10 @@ HarRequest * har_entry_get_request (HarEntry * self)
 void har_entry_set_request (HarEntry * self, HarRequest * value)
 {
   g_return_if_fail (self != NULL);
+  if (self->request)
+    g_object_unref(self->request);
+  if (value)
+    value = g_object_ref(value);
   self->request = value;
   g_object_notify ((GObject *) self, "request");
 }
@@ -293,6 +302,10 @@ HarResponse * har_entry_get_response (HarEntry * self)
 void har_entry_set_response (HarEntry * self, HarResponse * value)
 {
   g_return_if_fail (self != NULL);
+  if (self->response)
+    g_object_unref(self->response);
+  if (value)
+    value = g_object_ref(value);
   self->response = value;
   g_object_notify ((GObject *) self, "response");
 }
@@ -313,6 +326,7 @@ void har_entry_set_cache (HarEntry * self, HarCache * value)
 const gchar * har_entry_get_server_ip_address (HarEntry * self)
 {
   g_return_val_if_fail (self != NULL, NULL);
+  g_return_val_if_fail (self->priv != NULL, NULL);
   return self->priv->_server_ip_address;
 }
 
@@ -320,7 +334,9 @@ const gchar * har_entry_get_server_ip_address (HarEntry * self)
 void har_entry_set_server_ip_address (HarEntry * self, const gchar * value)
 {
   g_return_if_fail (self != NULL);
-  self->priv->_server_ip_address = value;
+  g_return_if_fail (self->priv != NULL);
+  g_return_if_fail (value != NULL);
+  self->priv->_server_ip_address = g_strdup(value);
   g_object_notify ((GObject *) self, "request");
 }
 
@@ -335,6 +351,7 @@ guint har_entry_get_server_port (HarEntry * self)
 void har_entry_set_server_port (HarEntry * self, guint value)
 {
   g_return_if_fail (self != NULL);
+  g_return_if_fail (self->priv != NULL);
   self->priv->_server_port = value;
   g_object_notify ((GObject *) self, "request");
 }
@@ -343,6 +360,7 @@ void har_entry_set_server_port (HarEntry * self, guint value)
 const gchar * har_entry_get_client_ip_address (HarEntry * self)
 {
   g_return_val_if_fail (self != NULL, NULL);
+  g_return_val_if_fail (self->priv != NULL, NULL);
   return self->priv->_client_ip_address;
 }
 
@@ -350,7 +368,7 @@ const gchar * har_entry_get_client_ip_address (HarEntry * self)
 void har_entry_set_client_ip_address (HarEntry * self, const gchar * value)
 {
   g_return_if_fail (self != NULL);
-  self->priv->_client_ip_address = value;
+  self->priv->_client_ip_address = g_strdup(value);
   g_object_notify ((GObject *) self, "request");
 }
 
@@ -358,6 +376,7 @@ void har_entry_set_client_ip_address (HarEntry * self, const gchar * value)
 guint har_entry_get_client_port (HarEntry * self)
 {
   g_return_val_if_fail (self != NULL, 0);
+  g_return_val_if_fail (self->priv != NULL, 0);
   return self->priv->_client_port;
 }
 
@@ -365,6 +384,7 @@ guint har_entry_get_client_port (HarEntry * self)
 void har_entry_set_client_port (HarEntry * self, guint value)
 {
   g_return_if_fail (self != NULL);
+  g_return_if_fail (self->priv != NULL);
   self->priv->_client_port = value;
   g_object_notify ((GObject *) self, "request");
 }
@@ -380,7 +400,8 @@ const gchar * har_entry_get_connection (HarEntry * self)
 void har_entry_set_connection (HarEntry * self, const gchar * value)
 {
   g_return_if_fail (self != NULL);
-  self->priv->_connection = value;
+  g_return_if_fail (value != NULL);
+  self->priv->_connection = g_strdup(value);
   g_object_notify ((GObject *) self, "request");
 }
 
@@ -395,7 +416,8 @@ HarTimings * har_entry_get_timings (HarEntry * self)
 void har_entry_set_timings (HarEntry * self, HarTimings * value)
 {
   g_return_if_fail (self != NULL);
-  self->timings = value;
+  g_return_if_fail (value != NULL);
+  self->timings = g_object_ref(value);
   g_object_notify ((GObject *) self, "request");
 }
 
@@ -410,7 +432,8 @@ HarTimings * har_entry_get_timeouts (HarEntry * self)
 void har_entry_set_timeouts (HarEntry * self, HarTimings * value)
 {
   g_return_if_fail (self != NULL);
-  self->timeouts = value;
+  g_return_if_fail (value != NULL);
+  self->timeouts = g_object_ref(value);
   g_object_notify ((GObject *) self, "request");
 }
 

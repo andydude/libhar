@@ -32,8 +32,32 @@ har_message_body_get_property (
     HarMessageBody * self = HAR_MESSAGE_BODY (object);
   switch (property_id) {
 
+      /* HarObject */
   case HAR_MESSAGE_BODY_COMMENT:
     g_value_set_string (value, har_message_body_get_comment (self));
+    break;
+
+      /* HarMessageBody */
+  case HAR_MESSAGE_BODY_COMPRESSED_LENGTH:
+    g_value_set_int (value, har_message_body_get_compressed_size (self));
+    break;
+  case HAR_MESSAGE_BODY_COMPRESSION:
+    g_value_set_int (value, har_message_body_get_compression (self));
+    break;
+  case HAR_MESSAGE_BODY_ENCODING:
+    g_value_set_string (value, har_message_body_get_encoding (self));
+    break;
+  case HAR_MESSAGE_BODY_MIME_TYPE:
+    g_value_set_string (value, har_message_body_get_mime_type (self));
+    break;
+  case HAR_MESSAGE_BODY_CHARSET:
+    g_value_set_string (value, har_message_body_get_charset (self));
+    break;
+  case HAR_MESSAGE_BODY_LENGTH:
+    g_value_set_int (value, har_message_body_get_size (self));
+    break;
+  case HAR_MESSAGE_BODY_TEXT:
+    g_value_set_boxed (value, har_message_body_get_text (self));
     break;
 
   default:
@@ -52,9 +76,33 @@ har_message_body_set_property (
 {
   HarMessageBody * self = HAR_MESSAGE_BODY (object);
   switch (property_id) {
-
+      
+      /* HarObject */
   case HAR_MESSAGE_BODY_COMMENT:
     har_message_body_set_comment (self, g_value_get_string (value));
+    break;
+
+      /* HarMessageBody */
+  case HAR_MESSAGE_BODY_COMPRESSED_LENGTH:
+    har_message_body_set_compressed_size (self, g_value_get_int (value));
+    break;
+  case HAR_MESSAGE_BODY_COMPRESSION:
+    har_message_body_set_compression (self, g_value_get_int (value));
+    break;
+  case HAR_MESSAGE_BODY_ENCODING:
+    har_message_body_set_encoding (self, g_value_get_string (value));
+    break;
+  case HAR_MESSAGE_BODY_MIME_TYPE:
+    har_message_body_set_mime_type (self, g_value_get_string (value));
+    break;
+  case HAR_MESSAGE_BODY_CHARSET:
+    har_message_body_set_charset (self, g_value_get_string (value));
+    break;
+  case HAR_MESSAGE_BODY_LENGTH:
+    har_message_body_set_size (self, g_value_get_int (value));
+    break;
+  case HAR_MESSAGE_BODY_TEXT:
+    har_message_body_set_text (self, g_value_get_boxed (value));
     break;
 
   default:
@@ -72,8 +120,25 @@ har_message_body_class_init (HarMessageBodyClass * klass)
 
 #define FLAGS (G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE | G_PARAM_WRITABLE)
 
+  /* HarObject */
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_MESSAGE_BODY_COMMENT,
     g_param_spec_string ("comment", "comment", "comment", NULL, FLAGS));
+
+  /* HarMessageBody */
+  g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_MESSAGE_BODY_COMPRESSED_LENGTH,
+    g_param_spec_int ("compressedSize", "compressedSize", "", -1, G_MAXINT, -1, FLAGS));
+  g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_MESSAGE_BODY_COMPRESSION,
+    g_param_spec_int ("compression", "compression", "", -1, G_MAXINT, -1, FLAGS));
+  g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_MESSAGE_BODY_ENCODING,
+    g_param_spec_string ("encoding", "encoding", "", NULL, FLAGS));
+  g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_MESSAGE_BODY_MIME_TYPE,
+    g_param_spec_string ("mimeType", "mime-type", "", NULL, FLAGS));
+  g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_MESSAGE_BODY_CHARSET,
+    g_param_spec_string ("charset", "charset", "", NULL, FLAGS));
+  g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_MESSAGE_BODY_LENGTH,
+    g_param_spec_int ("size", "size", "", -1, G_MAXINT, -1, FLAGS));
+  g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_MESSAGE_BODY_TEXT,
+    g_param_spec_boxed ("text", "text", "", G_TYPE_BYTES, FLAGS));
 
 #undef FLAGS
 
@@ -84,6 +149,8 @@ static void
 har_message_body_init (HarMessageBody * self)
 {
   g_return_if_fail (self != NULL);
+  self->priv = G_TYPE_INSTANCE_GET_PRIVATE (self, HAR_TYPE_MESSAGE_BODY, HarMessageBodyPrivate);
+  g_return_if_fail (self->priv != NULL);
 }
 
 
@@ -118,7 +185,7 @@ void har_message_body_set_compressed_size (HarMessageBody * self, gint value)
 {
   g_return_if_fail (self != NULL);
   self->priv->_compressed_length = value;
-  g_object_notify ((GObject *) self, "dns");
+  g_object_notify ((GObject *) self, "compressedSize");
 }
 
 
@@ -133,7 +200,7 @@ void har_message_body_set_compression (HarMessageBody * self, gint value)
 {
   g_return_if_fail (self != NULL);
   self->priv->_compression = value;
-  g_object_notify ((GObject *) self, "dns");
+  g_object_notify ((GObject *) self, "compression");
 }
 
 
@@ -148,7 +215,7 @@ void har_message_body_set_encoding (HarMessageBody * self, const gchar * value)
 {
   g_return_if_fail (self != NULL);
   self->priv->_encoding = value;
-  g_object_notify ((GObject *) self, "dns");
+  g_object_notify ((GObject *) self, "encoding");
 }
 
 
@@ -163,7 +230,7 @@ void har_message_body_set_mime_type (HarMessageBody * self, const gchar * value)
 {
   g_return_if_fail (self != NULL);
   self->priv->_mime_type = value;
-  g_object_notify ((GObject *) self, "dns");
+  g_object_notify ((GObject *) self, "mimeType");
 }
 
 
@@ -178,7 +245,7 @@ void har_message_body_set_charset (HarMessageBody * self, const gchar * value)
 {
   g_return_if_fail (self != NULL);
   self->priv->_charset = value;
-  g_object_notify ((GObject *) self, "dns");
+  g_object_notify ((GObject *) self, "charset");
 }
 
 
@@ -193,7 +260,7 @@ void har_message_body_set_size (HarMessageBody * self, gint value)
 {
   g_return_if_fail (self != NULL);
   self->priv->_length = value;
-  g_object_notify ((GObject *) self, "dns");
+  g_object_notify ((GObject *) self, "size");
 }
 
 
@@ -208,7 +275,7 @@ void har_message_body_set_text (HarMessageBody * self, GBytes * value)
 {
   g_return_if_fail (self != NULL);
   self->priv->_content = value;
-  g_object_notify ((GObject *) self, "dns");
+  g_object_notify ((GObject *) self, "text");
 }
 
 

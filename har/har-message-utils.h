@@ -11,9 +11,19 @@
 #define __HAR_MESSAGE_UTILS_H__
 
 #include <glib.h>
+#include <gmodule.h>
+#include <json-glib/json-glib.h>
 
-guint har_parse_http_version_string(gchar * version, gsize version_length);
+void har_init (void);
 
-gchar * har_render_http_version_string(guint version_number);
+guint har_parse_http_version_string(const gchar * version, gsize version_length);
+
+const gchar * har_render_http_version_string(guint version_number);
+
+//JsonNode *
+//har_slist_serialize(GSList * boxed);
+//
+//GSList * 
+//har_slist_deserialize(JsonNode *node);
 
 #endif

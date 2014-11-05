@@ -7,7 +7,7 @@
  * GNU Lesser General Public License ("LGPLv3") <https://www.gnu.org/licenses/lgpl.html>.
  */
 
-#include <har/har-response.h>
+#include "har-response.h"
 #include "gslist.h"
 
 /*
@@ -56,10 +56,10 @@ har_response_get_property (
     g_value_set_int (value, har_response_get_version (self));
     break;
   case HAR_RESPONSE_COOKIES:
-    g_value_set_object (value, har_response_get_cookies (self));
+    g_value_set_boxed (value, har_response_get_cookies (self));
     break;
   case HAR_RESPONSE_HEADERS:
-    g_value_set_object (value, har_response_get_headers (self));
+    g_value_set_boxed (value, har_response_get_headers (self));
     break;
   case HAR_RESPONSE_BODY:
     g_value_set_object (value, har_response_get_body (self));
@@ -70,6 +70,12 @@ har_response_get_property (
   case HAR_RESPONSE_BODY_SIZE:
     g_value_set_int (value, har_response_get_body_size (self));
     break;
+  case HAR_RESPONSE_HTTP_VERSION:
+    g_value_set_string (value, har_response_get_http_version (self));
+    break;
+  //case HAR_RESPONSE_HTTP_HEADERS:
+  //  g_value_set_object (value, har_response_get_http_headers (self));
+  //  break;
 
     /* HarResponse */
   case HAR_RESPONSE_STATUS:
@@ -109,10 +115,10 @@ har_response_set_property (
     har_response_set_version (self, g_value_get_int (value));
     break;
   case HAR_RESPONSE_COOKIES:
-    har_response_set_cookies (self, g_value_get_object (value));
+    har_response_set_cookies (self, g_value_get_boxed (value));
     break;
   case HAR_RESPONSE_HEADERS:
-    har_response_set_headers (self, g_value_get_object (value));
+    har_response_set_headers (self, g_value_get_boxed (value));
     break;
   case HAR_RESPONSE_BODY:
     har_response_set_body (self, g_value_get_object (value));
@@ -123,6 +129,12 @@ har_response_set_property (
   case HAR_RESPONSE_BODY_SIZE:
     har_response_set_body_size (self, g_value_get_int (value));
     break;
+  case HAR_RESPONSE_HTTP_VERSION:
+    har_response_set_http_version (self, g_value_get_string (value));
+    break;
+  //case HAR_RESPONSE_HTTP_HEADERS:
+  //  har_response_set_http_headers (self, g_value_get_object (value));
+  //  break;
 
     /* HarResponse */
   case HAR_RESPONSE_STATUS:
@@ -156,30 +168,34 @@ har_response_class_init (HarResponseClass * klass)
 
   /* HarMessage */
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_RESPONSE_VERSION,
-    g_param_spec_uint ("version", "httpVersion", "HTTP version number.", 
+    g_param_spec_uint ("httpVersionNumber", "http-version-number", "HTTP version number.", 
                        9,  /* HTTP/0.9 minimum */
                        20, /* HTTP/2.0 maximum */
                        11, /* HTTP/1.1 default */
                        FLAGS));
 
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_RESPONSE_COOKIES, 
-    g_param_spec_object ("cookies", "cookies", "Cookies.", G_TYPE_SLIST, FLAGS));
+    g_param_spec_boxed ("cookies", "cookies", "Cookies.", G_TYPE_SLIST, FLAGS));
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_RESPONSE_HEADERS, 
-    g_param_spec_object ("headers", "headers", "Headers.", HAR_TYPE_HEADERS, FLAGS));
-  g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_RESPONSE_BODY, 
-    g_param_spec_object ("body", "content", "Post", HAR_TYPE_RESPONSE_BODY, FLAGS));
+    g_param_spec_boxed ("headers", "headers", "Headers.", G_TYPE_SLIST, FLAGS));
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_RESPONSE_HEADERS_SIZE, 
-    g_param_spec_int ("headers-size", "headersSize", "TODO.", -1, G_MAXINT, -1, FLAGS));
+    g_param_spec_int ("headersSize", "headers-size", "TODO.", -1, G_MAXINT, -1, FLAGS));
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_RESPONSE_BODY_SIZE, 
-    g_param_spec_int ("body-size", "bodySize", "TODO.", -1, G_MAXINT, -1, FLAGS));
+    g_param_spec_int ("bodySize", "body-size", "TODO.", -1, G_MAXINT, -1, FLAGS));
+  g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_RESPONSE_HTTP_VERSION,
+    g_param_spec_string ("httpVersion", "http-version", "TODO.", NULL, FLAGS));
+  //g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_RESPONSE_HTTP_HEADERS,
+  //  g_param_spec_object ("httpHeaders", "http-headers", "TODO.", NULL, FLAGS));
 
   /* HarResponse */
+  g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_RESPONSE_BODY, 
+    g_param_spec_object ("content", "response body", "TODO.", HAR_TYPE_RESPONSE_BODY, FLAGS));
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_RESPONSE_STATUS, 
-    g_param_spec_uint ("status-code", "status", "TODO.", 0, G_MAXUINT, 0, FLAGS));
+    g_param_spec_uint ("status", "status-code", "TODO.", 0, G_MAXUINT, 0, FLAGS));
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_RESPONSE_REASON, 
-    g_param_spec_string ("reason-phrase", "statusText", "TODO.", NULL, FLAGS));
+    g_param_spec_string ("statusText", "reason-phrase", "TODO.", NULL, FLAGS));
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_RESPONSE_REDIRECT_URL, 
-    g_param_spec_string ("redirect-url", "redirectURL", "TODO.", NULL, FLAGS));
+    g_param_spec_string ("redirectURL", "redirect-url", "TODO.", NULL, FLAGS));
 
 #undef FLAGS
 
@@ -187,7 +203,16 @@ har_response_class_init (HarResponseClass * klass)
 
 
 static void 
-har_response_init (HarResponse * self) {
+har_response_init (HarResponse * self)
+{
+  g_return_if_fail (self != NULL);
+  self->priv = G_TYPE_INSTANCE_GET_PRIVATE (self, HAR_TYPE_RESPONSE, HarResponsePrivate);
+  g_return_if_fail (self->priv != NULL);
+
+  self->body = har_response_body_new ();
+  self->priv->_redirect_url = "";
+  self->priv->_reason = "";
+  self->status = 0;
 }
 
 
@@ -227,24 +252,27 @@ void har_response_set_cookies (HarResponse * self, GSList * value)
     har_message_set_cookies (HAR_MESSAGE (self), value);
 }
 
-HarHeaders * har_response_get_headers (HarResponse* self)
+GSList * har_response_get_headers (HarResponse* self)
 {
     return har_message_get_headers (HAR_MESSAGE (self));
 }
 
-void har_response_set_headers (HarResponse * self, HarHeaders * value)
+void har_response_set_headers (HarResponse * self, GSList * value)
 {
     har_message_set_headers (HAR_MESSAGE (self), value);
 }
 
 HarResponseBody * har_response_get_body (HarResponse* self)
 {
-    return HAR_RESPONSE_BODY (har_message_get_body (HAR_MESSAGE (self)));
+  g_return_val_if_fail (self != NULL, NULL);
+  return self->body;
 }
 
 void har_response_set_body (HarResponse * self, HarResponseBody * value)
 {
-  har_message_set_body (HAR_MESSAGE (self), HAR_MESSAGE_BODY (value));
+  g_return_if_fail (self != NULL);
+  self->body = value;
+  g_object_notify ((GObject *) self, "content");
 }
 
 gint har_response_get_headers_size (HarResponse* self)
@@ -268,6 +296,28 @@ void har_response_set_body_size (HarResponse * self, gint value)
 }
 
 
+const gchar * har_response_get_http_version (HarResponse * self)
+{
+  return har_message_get_http_version (HAR_MESSAGE (self));
+}
+
+void har_response_set_http_version (HarResponse * self, const gchar * value)
+{
+  har_message_set_http_version (HAR_MESSAGE (self), value);
+}
+
+//HarHeaders * har_response_get_http_headers (HarResponse * self)
+//{
+//  return har_message_get_http_headers (HAR_MESSAGE (self));
+//}
+//
+//void har_response_set_http_headers (HarResponse * self, HarHeaders * value)
+//{
+//  har_message_set_http_headers (HAR_MESSAGE (self), value);
+//}
+
+
+
 guint har_response_get_status (HarResponse* self)
 {
   g_return_val_if_fail (self != NULL, 0);
@@ -278,7 +328,7 @@ void har_response_set_status (HarResponse * self, guint value)
 {
   g_return_if_fail (self != NULL);
   self->status = value;
-  g_object_notify ((GObject *) self, "method");
+  g_object_notify ((GObject *) self, "status");
 }
 
 const gchar * har_response_get_reason (HarResponse* self)
@@ -290,8 +340,8 @@ const gchar * har_response_get_reason (HarResponse* self)
 void har_response_set_reason (HarResponse * self, const gchar * value)
 {
   g_return_if_fail (self != NULL);
-  self->priv->_reason = value;
-  g_object_notify ((GObject *) self, "url");
+  self->priv->_reason = g_strdup (value);
+  g_object_notify ((GObject *) self, "statusText");
 }
 
 const gchar * har_response_get_redirect_url (HarResponse* self)
@@ -303,8 +353,8 @@ const gchar * har_response_get_redirect_url (HarResponse* self)
 void har_response_set_redirect_url (HarResponse * self, const gchar * value)
 {
   g_return_if_fail (self != NULL);
-  self->priv->_redirect_url = value;
-  g_object_notify ((GObject *) self, "query");
+  self->priv->_redirect_url = g_strdup (value);
+  g_object_notify ((GObject *) self, "redirectURL");
 }
 
 

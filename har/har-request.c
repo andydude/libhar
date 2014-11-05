@@ -42,10 +42,10 @@ har_request_get_property (
     g_value_set_int (value, har_request_get_version (self));
     break;
   case HAR_REQUEST_COOKIES:
-    g_value_set_object (value, har_request_get_cookies (self));
+    g_value_set_boxed (value, har_request_get_cookies (self));
     break;
   case HAR_REQUEST_HEADERS:
-    g_value_set_object (value, har_request_get_headers (self));
+    g_value_set_boxed (value, har_request_get_headers (self));
     break;
   case HAR_REQUEST_BODY:
     g_value_set_object (value, har_request_get_body (self));
@@ -56,6 +56,12 @@ har_request_get_property (
   case HAR_REQUEST_BODY_SIZE:
     g_value_set_int (value, har_request_get_body_size (self));
     break;
+  case HAR_REQUEST_HTTP_VERSION:
+    g_value_set_string (value, har_request_get_http_version (self));
+    break;
+  //case HAR_REQUEST_HTTP_HEADERS:
+  //  g_value_set_object (value, har_request_get_http_headers (self));
+  //  break;
 
     /* HarRequest */
   case HAR_REQUEST_METHOD:
@@ -65,7 +71,7 @@ har_request_get_property (
     g_value_set_string (value, har_request_get_url (self));
     break;
   case HAR_REQUEST_QUERY:
-    g_value_set_object (value, har_request_get_query (self));
+    g_value_set_boxed (value, har_request_get_query (self));
     break;
 
   default:
@@ -95,10 +101,10 @@ har_request_set_property (
     har_request_set_version (self, g_value_get_int (value));
     break;
   case HAR_REQUEST_COOKIES:
-    har_request_set_cookies (self, g_value_get_object (value));
+    har_request_set_cookies (self, g_value_get_boxed (value));
     break;
   case HAR_REQUEST_HEADERS:
-    har_request_set_headers (self, g_value_get_object (value));
+    har_request_set_headers (self, g_value_get_boxed (value));
     break;
   case HAR_REQUEST_BODY:
     har_request_set_body (self, g_value_get_object (value));
@@ -109,6 +115,12 @@ har_request_set_property (
   case HAR_REQUEST_BODY_SIZE:
     har_request_set_body_size (self, g_value_get_int (value));
     break;
+  case HAR_REQUEST_HTTP_VERSION:
+    har_request_set_http_version (self, g_value_get_string (value));
+    break;
+  //case HAR_REQUEST_HTTP_HEADERS:
+  //  har_request_set_http_headers (self, g_value_get_object (value));
+  //  break;
 
     /* HarRequest */
   case HAR_REQUEST_METHOD:
@@ -118,7 +130,7 @@ har_request_set_property (
     har_request_set_url (self, g_value_get_string (value));
     break;
   case HAR_REQUEST_QUERY:
-    har_request_set_query (self, g_value_get_object (value));
+    har_request_set_query (self, g_value_get_boxed (value));
     break;
 
   default:
@@ -138,14 +150,12 @@ har_request_class_init (HarRequestClass * klass) {
 #define FLAGS (G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READWRITE)
 
   /* HarObject */
-
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_REQUEST_COMMENT,
     g_param_spec_string ("comment", "comment", "Comment.", NULL, FLAGS));
 
-  /* HarRequest */
-
+  /* HarMessage */
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_REQUEST_VERSION,
-    g_param_spec_uint ("version", "httpVersion", "HTTP version number.", 
+    g_param_spec_uint ("httpVersionNumber", "http-version-number", "HTTP version number.", 
                        9,  /* HTTP/0.9 minimum */
                        20, /* HTTP/2.0 maximum */
                        11, /* HTTP/1.1 default */
@@ -154,32 +164,50 @@ har_request_class_init (HarRequestClass * klass) {
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_REQUEST_COOKIES,
     g_param_spec_boxed ("cookies", "cookies", "Cookies.", G_TYPE_SLIST, FLAGS));
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_REQUEST_HEADERS,
-    g_param_spec_object ("headers", "headers", "Headers.", HAR_TYPE_HEADERS, FLAGS));
-  g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_REQUEST_BODY,
-    g_param_spec_object ("body", "postData", "TODO.", HAR_TYPE_REQUEST_BODY, FLAGS));
+    g_param_spec_boxed ("headers", "headers", "Headers.", G_TYPE_SLIST, FLAGS));
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_REQUEST_HEADERS_SIZE,
-    g_param_spec_int ("headers-size", "headersSize", "TODO.", -1, G_MAXINT, -1, FLAGS));
+    g_param_spec_int ("headersSize", "headers-size", "TODO.", -1, G_MAXINT, -1, FLAGS));
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_REQUEST_BODY_SIZE,
-    g_param_spec_int ("body-size", "bodySize", "TODO.", -1, G_MAXINT, -1, FLAGS));
+    g_param_spec_int ("bodySize", "body-size", "TODO.", -1, G_MAXINT, -1, FLAGS));
+  g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_REQUEST_HTTP_VERSION,
+    g_param_spec_string ("httpVersion", "http-version", "TODO.", NULL, FLAGS));
+  //g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_REQUEST_HTTP_HEADERS,
+  //  g_param_spec_object ("httpHeaders", "http-headers", "TODO.", NULL, FLAGS));
+
+  /* HarRequest */
+  g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_REQUEST_BODY,
+    g_param_spec_object ("postData", "request body", "TODO.", HAR_TYPE_REQUEST_BODY, FLAGS));
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_REQUEST_METHOD,
     g_param_spec_string ("method", "method", "TODO.", NULL, FLAGS));
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_REQUEST_URL,
     g_param_spec_string ("url", "url", "TODO.", NULL, FLAGS));
   g_object_class_install_property (G_OBJECT_CLASS (klass), HAR_REQUEST_QUERY,
-    g_param_spec_boxed ("query", "queryString", "TODO.", G_TYPE_SLIST, FLAGS));
+    g_param_spec_boxed ("queryString", "query string params", "TODO.", G_TYPE_SLIST, FLAGS));
 
 #undef FLAGS
 }
 
 
 static void 
-har_request_init (HarRequest * self) {
+har_request_init (HarRequest * self) 
+{
+  g_return_if_fail (self != NULL);
+  self->priv = G_TYPE_INSTANCE_GET_PRIVATE (self, HAR_TYPE_REQUEST, HarRequestPrivate);
+  g_return_if_fail (self->priv != NULL);
+
+  self->body = har_request_body_new ();
+  self->method = "";
+  self->url = "";
+  self->query = NULL;
 }
 
 
 HarRequest * 
 har_request_new (void) {
-  return g_object_new (HAR_TYPE_REQUEST, NULL);
+  HarRequest * result;
+  result = g_object_new (HAR_TYPE_REQUEST, NULL);
+  har_request_init(result);
+  return result;
 }
 
 
@@ -214,24 +242,31 @@ void har_request_set_cookies (HarRequest * self, GSList * value)
   har_message_set_cookies (HAR_MESSAGE (self), value);
 }
 
-HarHeaders * har_request_get_headers (HarRequest* self)
+GSList * har_request_get_headers (HarRequest* self)
 {
   return har_message_get_headers (HAR_MESSAGE (self));
 }
 
-void har_request_set_headers (HarRequest * self, HarHeaders * value)
+void har_request_set_headers (HarRequest * self, GSList * value)
 {
   har_message_set_headers (HAR_MESSAGE (self), value);
 }
 
 HarRequestBody * har_request_get_body (HarRequest* self)
 {
-  return HAR_REQUEST_BODY (har_message_get_body (HAR_MESSAGE (self)));
+  g_return_val_if_fail (self != NULL, NULL);
+  return self->body;
 }
 
 void har_request_set_body (HarRequest * self, HarRequestBody * value)
 {
-  har_message_set_body (HAR_MESSAGE (self), HAR_MESSAGE_BODY (value));
+  g_return_if_fail (self != NULL);
+  if (self->body)
+    g_object_unref (self->body);
+  if (value)
+    value = g_object_ref (value);
+  self->body = value;
+  g_object_notify ((GObject *) self, "postData");
 }
 
 gint har_request_get_headers_size (HarRequest* self)
@@ -255,6 +290,27 @@ void har_request_set_body_size (HarRequest * self, gint value)
 }
 
 
+const gchar * har_request_get_http_version (HarRequest * self)
+{
+  return har_message_get_http_version (HAR_MESSAGE (self));
+}
+
+void har_request_set_http_version (HarRequest * self, const gchar * value)
+{
+  har_message_set_http_version (HAR_MESSAGE (self), value);
+}
+
+//HarHeaders * har_request_get_http_headers (HarRequest * self)
+//{
+//  return har_message_get_http_headers (HAR_MESSAGE (self));
+//}
+//
+//void har_request_set_http_headers (HarRequest * self, HarHeaders * value)
+//{
+//  har_message_set_http_headers (HAR_MESSAGE (self), value);
+//}
+
+
 const gchar * har_request_get_method (HarRequest* self)
 {
   g_return_val_if_fail (self != NULL, NULL);
@@ -264,7 +320,7 @@ const gchar * har_request_get_method (HarRequest* self)
 void har_request_set_method (HarRequest * self, const gchar * value)
 {
   g_return_if_fail (self != NULL);
-  self->method = value;
+  self->method = g_strdup (value);
   g_object_notify ((GObject *) self, "method");
 }
 
@@ -277,7 +333,7 @@ const gchar * har_request_get_url (HarRequest* self)
 void har_request_set_url (HarRequest * self, const gchar * value)
 {
   g_return_if_fail (self != NULL);
-  self->url = value;
+  self->url = g_strdup (value);
   g_object_notify ((GObject *) self, "url");
 }
 
@@ -291,5 +347,5 @@ void har_request_set_query (HarRequest * self, GSList * value)
 {
   g_return_if_fail (self != NULL);
   self->query = value;
-  g_object_notify ((GObject *) self, "query");
+  g_object_notify ((GObject *) self, "queryString");
 }

@@ -42,15 +42,19 @@ typedef struct _HarRequest HarRequest;
 typedef struct _HarRequestClass HarRequestClass;
 typedef struct _HarRequestPrivate HarRequestPrivate;
 
-struct _HarRequestPrivate {
+struct _HarRequestPrivate 
+{
   /*< private >*/
   gboolean _auto_method;
 };
 
 struct _HarRequest
 {
+  /*< private >*/
   HarMessage parent_instance;
   HarRequestPrivate * priv;
+  /*< public >*/
+  HarRequestBody * body;
   const gchar * method;
   const gchar * url;
   GSList * query;
@@ -71,11 +75,13 @@ enum _HarRequestProperties {
   HAR_REQUEST_VERSION,
   HAR_REQUEST_COOKIES,
   HAR_REQUEST_HEADERS,
-  HAR_REQUEST_BODY,
   HAR_REQUEST_HEADERS_SIZE,
   HAR_REQUEST_BODY_SIZE,
+  HAR_REQUEST_HTTP_VERSION,
+  //HAR_REQUEST_HTTP_HEADERS,
 
   /* HarRequest */
+  HAR_REQUEST_BODY,
   HAR_REQUEST_METHOD,
   HAR_REQUEST_URL,
   HAR_REQUEST_QUERY,
@@ -116,16 +122,16 @@ void har_request_set_cookies (HarRequest * self, GSList * value);
  * har_request_get_headers:
  * @self: a #HarRequest.
  *
- * Returns: (transfer none) (type HarHeaders): a #HarHeaders.
+ * Returns: (transfer none) (element-type HarHeader): a #GSList of #HarHeader.
  */
-HarHeaders * har_request_get_headers (HarRequest * self);
+GSList * har_request_get_headers (HarRequest * self);
 
 /**
  * har_request_set_headers:
  * @self: a #HarRequest.
- * @value: (transfer full) (type HarHeaders): a #HarHeaders.
+ * @value: (transfer full)(element-type HarHeader): a #GSList of #HarHeader.
  */
-void har_request_set_headers (HarRequest * self, HarHeaders * value);
+void har_request_set_headers (HarRequest * self, GSList * value);
 
 /**
  * har_request_get_body:
@@ -168,6 +174,21 @@ GSList * har_request_get_query (HarRequest * self);
  * @value: (transfer full) (element-type HarQueryParam): a #GSList of #HarQueryParam.
  */
 void har_request_set_query (HarRequest * self, GSList * value);
+
+/**
+ * har_request_get_http_version:
+ * @self: a #HarRequest.
+ *
+ * Returns: a number.
+ */
+const gchar * har_request_get_http_version (HarRequest * self);
+
+/**
+ * har_request_set_http_version:
+ * @self: a #HarRequest.
+ * @value: a number.
+ */
+void har_request_set_http_version (HarRequest * self, const gchar * value);
 
 G_END_DECLS
 

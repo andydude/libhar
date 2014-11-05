@@ -43,7 +43,6 @@ struct _HarMessage
   HarMessagePrivate * priv;
   GSList * cookies;
   HarHeaders * headers;
-  HarMessageBody * body;
 };
 
 struct _HarMessageClass
@@ -64,6 +63,8 @@ enum _HarMessageProperties {
   HAR_MESSAGE_BODY,
   HAR_MESSAGE_HEADERS_SIZE,
   HAR_MESSAGE_BODY_SIZE,
+  HAR_MESSAGE_HTTP_VERSION,
+  //HAR_MESSAGE_HTTP_HEADERS,
 
   HAR_MESSAGE_N_PROPERTIES
 };
@@ -125,38 +126,91 @@ void har_message_set_cookies (HarMessage * self, GSList * value);
  * har_message_get_headers:
  * @self: a #HarMessage.
  *
- *
- * Returns: (transfer none) (type HarHeaders): a #HarHeaders.
+ * Returns: (transfer none) (element-type HarHeader): a #GSList of #HarHeader.
  */
-HarHeaders * har_message_get_headers (HarMessage * self);
+GSList * har_message_get_headers (HarMessage * self);
 
 /**
  * har_message_set_headers:
  * @self: a #HarMessage.
- * @value: (transfer full) (type HarHeaders): a #HarHeaders.
+ * @value: (transfer full) (element-type HarHeader): a #GSList of #HarHeader.
  */
-void har_message_set_headers (HarMessage * self, HarHeaders * value);
+void har_message_set_headers (HarMessage * self, GSList * value);
+
+///**
+// * har_message_get_body:
+// * @self: a #HarMessage.
+// *
+// * Returns: (transfer none) (type HarMessageBody): a #HarMessageBody.
+// */
+//HarMessageBody * har_message_get_body (HarMessage * self);
+//
+///**
+// * har_message_set_body:
+// * @self: a #HarMessage.
+// * @value: (transfer full) (type HarMessageBody): a #HarMessageBody.
+// */
+//void har_message_set_body (HarMessage * self, HarMessageBody * value);
 
 /**
- * har_message_get_body:
+ * har_message_get_headers_size:
  * @self: a #HarMessage.
  *
- * Returns: (transfer none) (type HarMessageBody): a #HarMessageBody.
+ * Returns: a number.
  */
-HarMessageBody * har_message_get_body (HarMessage * self);
+gint har_message_get_headers_size (HarMessage * self);
 
 /**
- * har_message_set_body:
+ * har_message_set_headers_size:
  * @self: a #HarMessage.
- * @value: (transfer full) (type HarMessageBody): a #HarMessageBody.
+ * @value: a number.
  */
-void har_message_set_body (HarMessage * self, HarMessageBody * value);
-
-gint har_message_get_headers_size (HarMessage * self);
 void har_message_set_headers_size (HarMessage * self, gint value);
 
+/**
+ * har_message_get_body_size:
+ * @self: a #HarMessage.
+ *
+ * Returns: a number.
+ */
 gint har_message_get_body_size (HarMessage * self);
+
+/**
+ * har_message_set_body_size:
+ * @self: a #HarMessage.
+ * @value: a number.
+ */
 void har_message_set_body_size (HarMessage * self, gint value);
+
+/**
+ * har_message_get_http_version:
+ * @self: a #HarMessage.
+ *
+ * Returns: a number.
+ */
+const gchar * har_message_get_http_version (HarMessage * self);
+
+/**
+ * har_message_set_http_version:
+ * @self: a #HarMessage.
+ * @value: a number.
+ */
+void har_message_set_http_version (HarMessage * self, const gchar * value);
+
+///**
+// * har_message_get_http_headers:
+// * @self: a #HarMessage.
+// *
+// * Returns: a number.
+// */
+//HarHeaders * har_message_get_http_headers (HarMessage * self);
+//
+///**
+// * har_message_set_http_headers:
+// * @self: a #HarMessage.
+// * @value: a number.
+// */
+//void har_message_set_http_headers (HarMessage * self, HarHeaders * value);
 
 
 G_END_DECLS

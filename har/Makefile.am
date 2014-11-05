@@ -44,7 +44,6 @@ source_h = \
 	$(top_srcdir)/har/har-response-body.h \
 	$(top_srcdir)/har/har-response.h \
 	$(top_srcdir)/har/har-timings.h \
-	$(top_srcdir)/har/gslist.h \
 	$(NULL)
 
 
@@ -66,12 +65,34 @@ source_c = \
 	har-response-body.c \
 	har-response.c \
 	har-timings.c \
+    curl-easy.h \
+	curl-easy.c \
+    gslist.h \
 	gslist.c \
 	$(NULL)
 
+bin_PROGRAMS += \
+	har-entry-test \
+	har-request-test \
+	har-response-test \
+	har-timings-test \
+	$(NULL)
+
+har_entry_test_SOURCES = har-entry-test-main.c
+har_entry_test_LDFLAGS = -lhar $(AM_LDFLAGS)
+
+har_request_test_SOURCES = har-request-test-main.c
+har_request_test_LDFLAGS = -lhar $(AM_LDFLAGS)
+
+har_response_test_SOURCES = har-response-test-main.c
+har_response_test_LDFLAGS = -lhar $(AM_LDFLAGS)
+
+har_timings_test_SOURCES = har-timings-test-main.c
+har_timings_test_LDFLAGS = -lhar $(AM_LDFLAGS)
+
 lib_LTLIBRARIES += libhar.la
 libhar_la_SOURCES = $(source_c) $(source_h)
-libhar_la_LDFLAGS = -release 0.3 -version-info 0:3
+libhar_la_LDFLAGS = -release 0.3 -version-info 0:3 $(AM_LDFLAGS)
 
 harincludedir = $(includedir)/har
 harinclude_DATA = \
