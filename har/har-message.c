@@ -49,7 +49,7 @@ har_message_get_property (
 
     /* HarMessage */
   case HAR_MESSAGE_VERSION:
-    g_value_set_int (value, har_message_get_version (self));
+    g_value_set_uint (value, har_message_get_version (self));
     break;
   case HAR_MESSAGE_COOKIES:
     g_value_set_boxed (value, har_message_get_cookies (self));
@@ -94,6 +94,7 @@ har_message_set_property (
 
     /* HarMessage */
   case HAR_MESSAGE_VERSION:
+    printf(g_strdup_value_contents(value));
     har_message_set_version (self, g_value_get_uint (value));
     break;
   case HAR_MESSAGE_COOKIES:
@@ -285,7 +286,7 @@ void har_message_set_http_version (HarMessage * self, const gchar * value)
   g_return_if_fail (self != NULL);
   g_return_if_fail (value != NULL);
   self->priv->_http_version = g_strdup(value); //, strnlen(value, 16));
-  self->priv->_http_version_number = har_parse_http_version_string(value, strlen(value));
+  har_message_set_version(self, har_parse_http_version_string(value, strlen(value)));
   g_object_notify ((GObject *) self, "httpVersion");
 }
 

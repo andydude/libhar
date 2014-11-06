@@ -82,9 +82,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = har-entry-test$(EXEEXT) har-request-test$(EXEEXT) \
-	har-response-test$(EXEEXT) har-timings-test$(EXEEXT) \
-	$(am__EXEEXT_1)
+bin_PROGRAMS = har-cache-test$(EXEEXT) har-entry-test$(EXEEXT) \
+	har-request-test$(EXEEXT) har-response-test$(EXEEXT) \
+	har-timings-test$(EXEEXT) $(am__EXEEXT_1)
 @HAVE_INTROSPECTION_TRUE@am__append_1 = Har-1.gir
 @HAVE_INTROSPECTION_TRUE@am__append_2 = $(gir_DATA) $(typelib_DATA)
 subdir = har
@@ -154,6 +154,13 @@ libhar_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(libhar_la_LDFLAGS) $(LDFLAGS) -o $@
 am__EXEEXT_1 =
 PROGRAMS = $(bin_PROGRAMS)
+am_har_cache_test_OBJECTS = har-cache-test-main.$(OBJEXT)
+har_cache_test_OBJECTS = $(am_har_cache_test_OBJECTS)
+har_cache_test_LDADD = $(LDADD)
+har_cache_test_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(AM_CFLAGS) $(CFLAGS) $(har_cache_test_LDFLAGS) $(LDFLAGS) -o \
+	$@
 am_har_entry_test_OBJECTS = har-entry-test-main.$(OBJEXT)
 har_entry_test_OBJECTS = $(am_har_entry_test_OBJECTS)
 har_entry_test_LDADD = $(LDADD)
@@ -216,12 +223,12 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libhar_la_SOURCES) $(har_entry_test_SOURCES) \
-	$(har_request_test_SOURCES) $(har_response_test_SOURCES) \
-	$(har_timings_test_SOURCES)
-DIST_SOURCES = $(libhar_la_SOURCES) $(har_entry_test_SOURCES) \
-	$(har_request_test_SOURCES) $(har_response_test_SOURCES) \
-	$(har_timings_test_SOURCES)
+SOURCES = $(libhar_la_SOURCES) $(har_cache_test_SOURCES) \
+	$(har_entry_test_SOURCES) $(har_request_test_SOURCES) \
+	$(har_response_test_SOURCES) $(har_timings_test_SOURCES)
+DIST_SOURCES = $(libhar_la_SOURCES) $(har_cache_test_SOURCES) \
+	$(har_entry_test_SOURCES) $(har_request_test_SOURCES) \
+	$(har_response_test_SOURCES) $(har_timings_test_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -451,6 +458,8 @@ source_c = \
 	gslist.c \
 	$(NULL)
 
+har_cache_test_SOURCES = har-cache-test-main.c
+har_cache_test_LDFLAGS = -lhar $(AM_LDFLAGS)
 har_entry_test_SOURCES = har-entry-test-main.c
 har_entry_test_LDFLAGS = -lhar $(AM_LDFLAGS)
 har_request_test_SOURCES = har-request-test-main.c
@@ -603,6 +612,10 @@ clean-binPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
+har-cache-test$(EXEEXT): $(har_cache_test_OBJECTS) $(har_cache_test_DEPENDENCIES) $(EXTRA_har_cache_test_DEPENDENCIES) 
+	@rm -f har-cache-test$(EXEEXT)
+	$(AM_V_CCLD)$(har_cache_test_LINK) $(har_cache_test_OBJECTS) $(har_cache_test_LDADD) $(LIBS)
+
 har-entry-test$(EXEEXT): $(har_entry_test_OBJECTS) $(har_entry_test_DEPENDENCIES) $(EXTRA_har_entry_test_DEPENDENCIES) 
 	@rm -f har-entry-test$(EXEEXT)
 	$(AM_V_CCLD)$(har_entry_test_LINK) $(har_entry_test_OBJECTS) $(har_entry_test_LDADD) $(LIBS)
@@ -628,6 +641,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/curl-easy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gslist.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-cache-entry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-cache-test-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-cache.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-cookie.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/har-entry-test-main.Po@am__quote@

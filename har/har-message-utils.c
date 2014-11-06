@@ -18,10 +18,17 @@ har_bytes_serialize(gconstpointer boxed)
 {
   GBytes * bytes = (GBytes *) boxed;
   JsonNode * result = json_node_alloc ();
-  gsize nbytes = 0;
-  gchar * s = g_bytes_unref_to_data (g_bytes_ref (bytes), &nbytes);
+
+  gsize nbytes;
+  const gchar * s0 = g_bytes_get_data(bytes, &nbytes);
+  gchar * s = g_malloc0(nbytes + 1);
+  memcpy(s, s0, nbytes);
   s[nbytes] = '\0';
+
+  printf("'%d'\n", nbytes);
+  printf("'%s'\n", s);
   result = json_node_init_string (result, g_strdup(s));
+  g_free(s);
   return result;
 }
 
@@ -80,19 +87,25 @@ har_slist_serialize_element(gpointer data, gpointer user_data)
 static JsonNode *
 har_slist_serialize(gconstpointer boxed)
 {
-  if (!G_IS_OBJECT(boxed)) {
+  if (G_IS_OBJECT(boxed)) {
+    printf("arg is GObject");
+  }
+  if (!G_IS_VALUE(boxed)) {
     printf("har_slist_serialize FAILED\n");
     return NULL;
+  } else {
+    printf("arg is GValue\n");
   }
 
   printf("har_slist_serialize\n");
-  GSList * list = (GSList *) boxed;
+  GSList * list = g_value_peek_pointer(boxed);
   JsonNode * result;
   JsonBuilder * builder = json_builder_new();
   json_builder_begin_array(builder);
   g_slist_foreach(list, (GFunc) &har_slist_serialize_element, (gpointer) builder);
   json_builder_end_array(builder);
   result = json_builder_get_root(builder);
+
   g_object_unref(builder);
   return result;
 }
@@ -128,15 +141,15 @@ g_module_check_init(GModule *module)
     json_boxed_register_deserialize_func(G_TYPE_BYTES, JSON_NODE_VALUE,
       (JsonBoxedDeserializeFunc) &har_bytes_deserialize);
 
-    json_boxed_register_serialize_func(G_TYPE_DATE_TIME, JSON_NODE_ARRAY, 
+    json_boxed_register_serialize_func(G_TYPE_DATE_TIME, JSON_NODE_VALUE, 
       (JsonBoxedSerializeFunc) &har_date_time_serialize);
 
-    json_boxed_register_deserialize_func(G_TYPE_DATE_TIME, JSON_NODE_ARRAY,
+    json_boxed_register_deserialize_func(G_TYPE_DATE_TIME, JSON_NODE_VALUE,
       (JsonBoxedDeserializeFunc) &har_date_time_deserialize);
 
     json_boxed_register_serialize_func(G_TYPE_SLIST, JSON_NODE_ARRAY, 
       (JsonBoxedSerializeFunc) &har_slist_serialize);
-
+    
     json_boxed_register_deserialize_func(G_TYPE_SLIST, JSON_NODE_ARRAY,
       (JsonBoxedDeserializeFunc) &har_slist_deserialize);
 

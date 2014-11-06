@@ -151,7 +151,7 @@ void
 har_post_param_set_name (HarPostParam * self, const gchar * value)
 {
   g_return_if_fail (self != NULL);
-  self->name = value;
+  self->name = g_strdup (value);
   g_object_notify ((GObject *) self, "name");
 }
 
@@ -168,6 +168,6 @@ void
 har_post_param_set_value (HarPostParam * self, const gchar * value)
 {
   g_return_if_fail (self != NULL);
-  self->value = value;
+  self->value = g_strdup (value);
   g_object_notify ((GObject *) self, "value");
 }

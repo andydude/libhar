@@ -159,6 +159,9 @@ void
 har_cache_entry_set_expires (HarCacheEntry * self, GDateTime * value)
 {
   g_return_if_fail (self != NULL);
+  g_return_if_fail (value != NULL);
+  self->expires = g_date_time_ref (value);
+  g_object_notify ((GObject *) self, "expires");
 }
 
 GDateTime * 
@@ -172,6 +175,9 @@ void
 har_cache_entry_set_last_access (HarCacheEntry * self, GDateTime * value)
 {
   g_return_if_fail (self != NULL);
+  g_return_if_fail (value != NULL);
+  self->last_access = g_date_time_ref (value);
+  g_object_notify ((GObject *) self, "lastAccess");
 }
 
 const gchar * 
@@ -185,6 +191,9 @@ void
 har_cache_entry_set_etag (HarCacheEntry * self, const gchar * value)
 {
   g_return_if_fail (self != NULL);
+  g_return_if_fail (value != NULL);
+  self->etag = g_strdup (value);
+  g_object_notify ((GObject *) self, "etag");
 }
 
 gint 
@@ -198,4 +207,6 @@ void
 har_cache_entry_set_hit_count (HarCacheEntry * self, gint value)
 {
   g_return_if_fail (self != NULL);
+  self->hit_count = value;
+  g_object_notify ((GObject *) self, "hitCount");
 }

@@ -119,7 +119,9 @@ har_cache_init (HarCache * self)
 HarCache * 
 har_cache_new (void)
 {
-  return g_object_new (HAR_TYPE_CACHE, NULL);
+  HarCache * result;
+  result = g_object_new (HAR_TYPE_CACHE, NULL);
+  return result;
 }
 
 
@@ -149,8 +151,10 @@ void
 har_cache_set_before_request (HarCache * self, HarCacheEntry * value)
 {
   g_return_if_fail (self != NULL);
+  if (value)
+    value = g_object_ref(value);
   self->before_request = value;
-  g_object_notify ((GObject *) self, "before-request");
+  g_object_notify ((GObject *) self, "beforeRequest");
 }
 
 
@@ -166,7 +170,8 @@ void
 har_cache_set_after_request (HarCache * self, HarCacheEntry * value)
 {
   g_return_if_fail (self != NULL);
+  if (value)
+    value = g_object_ref(value);
   self->after_request = value;
-  g_object_notify ((GObject *) self, "after-request");
+  g_object_notify ((GObject *) self, "afterRequest");
 }
-

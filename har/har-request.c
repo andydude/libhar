@@ -39,7 +39,7 @@ har_request_get_property (
 
     /* HarMessage */
   case HAR_REQUEST_VERSION:
-    g_value_set_int (value, har_request_get_version (self));
+    g_value_set_uint (value, har_request_get_version (self));
     break;
   case HAR_REQUEST_COOKIES:
     g_value_set_boxed (value, har_request_get_cookies (self));
@@ -98,7 +98,7 @@ har_request_set_property (
 
     /* HarMessage */
   case HAR_REQUEST_VERSION:
-    har_request_set_version (self, g_value_get_int (value));
+    har_request_set_version (self, g_value_get_uint (value));
     break;
   case HAR_REQUEST_COOKIES:
     har_request_set_cookies (self, g_value_get_boxed (value));

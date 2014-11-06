@@ -53,7 +53,7 @@ har_response_get_property (
 
     /* HarMessage */
   case HAR_RESPONSE_VERSION:
-    g_value_set_int (value, har_response_get_version (self));
+    g_value_set_uint (value, har_response_get_version (self));
     break;
   case HAR_RESPONSE_COOKIES:
     g_value_set_boxed (value, har_response_get_cookies (self));
@@ -112,7 +112,7 @@ har_response_set_property (
 
     /* HarMessage */
   case HAR_RESPONSE_VERSION:
-    har_response_set_version (self, g_value_get_int (value));
+    har_response_set_version (self, g_value_get_uint (value));
     break;
   case HAR_RESPONSE_COOKIES:
     har_response_set_cookies (self, g_value_get_boxed (value));

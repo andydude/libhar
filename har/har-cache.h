@@ -98,7 +98,7 @@ void har_cache_set_comment (HarCache * self, const gchar * value);
 /**
  * har_cache_get_before_request:
  *
- * Returns: (transfer none): a #HarCacheEntry.
+ * Returns: (transfer full): a #HarCacheEntry.
  */
 HarCacheEntry * har_cache_get_before_request (HarCache * self);
 
@@ -111,7 +111,7 @@ void har_cache_set_before_request (HarCache * self, HarCacheEntry * value);
 /**
  * har_cache_get_after_request:
  *
- * Returns: (transfer none): a #HarCacheEntry.
+ * Returns: (transfer full): a #HarCacheEntry.
  */
 HarCacheEntry * har_cache_get_after_request (HarCache * self);
 

@@ -214,7 +214,7 @@ const gchar * har_message_body_get_encoding (HarMessageBody * self)
 void har_message_body_set_encoding (HarMessageBody * self, const gchar * value)
 {
   g_return_if_fail (self != NULL);
-  self->priv->_encoding = value;
+  self->priv->_encoding = g_strdup (value);
   g_object_notify ((GObject *) self, "encoding");
 }
 
@@ -229,7 +229,7 @@ const gchar * har_message_body_get_mime_type (HarMessageBody * self)
 void har_message_body_set_mime_type (HarMessageBody * self, const gchar * value)
 {
   g_return_if_fail (self != NULL);
-  self->priv->_mime_type = value;
+  self->priv->_mime_type = g_strdup (value);
   g_object_notify ((GObject *) self, "mimeType");
 }
 
@@ -244,7 +244,7 @@ const gchar * har_message_body_get_charset (HarMessageBody * self)
 void har_message_body_set_charset (HarMessageBody * self, const gchar * value)
 {
   g_return_if_fail (self != NULL);
-  self->priv->_charset = value;
+  self->priv->_charset = g_strdup (value);
   g_object_notify ((GObject *) self, "charset");
 }
 
@@ -274,7 +274,7 @@ GBytes * har_message_body_get_text (HarMessageBody * self)
 void har_message_body_set_text (HarMessageBody * self, GBytes * value)
 {
   g_return_if_fail (self != NULL);
-  self->priv->_content = value;
+  self->priv->_content = g_bytes_ref (value);
   g_object_notify ((GObject *) self, "text");
 }
 

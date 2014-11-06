@@ -82,19 +82,21 @@ GType har_cache_entry_get_type (void) G_GNUC_CONST;
 /**
  * har_cache_entry_new:
  *
- * Returns: (transfer full): a #HarCacheEntry.
+ * Returns: (constructor) (transfer full): a #HarCacheEntry.
  */
 HarCacheEntry * har_cache_entry_new (void);
 
 /**
  * har_cache_entry_get_comment:
  *
- * Returns: (type utf8) (transfer none): a string.
+ * Returns: (type utf8) (transfer full): a string.
  */
 const gchar * har_cache_entry_get_comment (HarCacheEntry * self);
 
 /**
  * har_cache_entry_set_comment:
+ * @self: (inout): a #HarCacheEntry.
+ * @value: (in) (transfer full): a string.
  *
  */
 void har_cache_entry_set_comment (HarCacheEntry * self, const gchar * value);
@@ -102,48 +104,64 @@ void har_cache_entry_set_comment (HarCacheEntry * self, const gchar * value);
 
 /**
  * har_cache_entry_get_expires:
+ * @self: (inout): a #HarCacheEntry.
  *
+ * Returns: (transfer full): a #GDateTime.
  */
 GDateTime * har_cache_entry_get_expires (HarCacheEntry * self);
 
 /**
  * har_cache_entry_set_expires:
+ * @self: (inout): a #HarCacheEntry.
+ * @value: (in) (transfer full): a #GDateTime.
  *
  */
 void har_cache_entry_set_expires (HarCacheEntry * self, GDateTime * value);
 
 /**
  * har_cache_entry_get_last_access:
+ * @self: (inout): a #HarCacheEntry.
  *
+ * Returns: (transfer full): a #GDateTime.
  */
 GDateTime * har_cache_entry_get_last_access (HarCacheEntry * self);
 
 /**
  * har_cache_entry_set_last_access:
+ * @self: (inout): a #HarCacheEntry.
+ * @value: (in) (transfer full): a #GDateTime.
  *
  */
 void har_cache_entry_set_last_access (HarCacheEntry * self, GDateTime * value);
 
 /**
  * har_cache_entry_get_etag:
+ * @self: (inout): a #HarCacheEntry.
  *
+ * Returns: (transfer full): a string.
  */
 const gchar * har_cache_entry_get_etag (HarCacheEntry * self);
 
 /**
  * har_cache_entry_set_etag:
+ * @self: (inout): a #HarCacheEntry.
+ * @value: (type utf8) (transfer full): a string.
  *
  */
 void har_cache_entry_set_etag (HarCacheEntry * self, const gchar * value);
 
 /**
  * har_cache_entry_get_hit_count:
+ * @self: (inout): a #HarCacheEntry.
  *
+ * Returns: a number.
  */
 gint har_cache_entry_get_hit_count (HarCacheEntry * self);
 
 /**
  * har_cache_entry_set_hit_count:
+ * @self: (inout): a #HarCacheEntry.
+ * @value: (in): a number.
  *
  */
 void har_cache_entry_set_hit_count (HarCacheEntry * self, gint value);

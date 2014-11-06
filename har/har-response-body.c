@@ -32,6 +32,7 @@ har_response_body_get_property (
 
       /* HarMessageBody */
   case HAR_RESPONSE_BODY_COMPRESSED_LENGTH:
+      g_strdup_value_contents(value);
     g_value_set_int (value, har_response_body_get_compressed_size (self));
     break;
   case HAR_RESPONSE_BODY_COMPRESSION:

@@ -72,11 +72,15 @@ source_c = \
 	$(NULL)
 
 bin_PROGRAMS += \
+	har-cache-test \
 	har-entry-test \
 	har-request-test \
 	har-response-test \
 	har-timings-test \
 	$(NULL)
+
+har_cache_test_SOURCES = har-cache-test-main.c
+har_cache_test_LDFLAGS = -lhar $(AM_LDFLAGS)
 
 har_entry_test_SOURCES = har-entry-test-main.c
 har_entry_test_LDFLAGS = -lhar $(AM_LDFLAGS)
